@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 
@@ -9,7 +10,7 @@ const supabase = createClient(
 );
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/entries', async (req, res) => {
   const { data, error } = await supabase
