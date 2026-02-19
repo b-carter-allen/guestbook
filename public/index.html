@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guestbook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Great+Vibes&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:     #1a1209;
+      --gold:    #b8953a;
+      --gold-lt: #d4af6a;
+      --cream:   #faf6ef;
+      --parchment: #f2ead8;
+      --rule:    #d6c89a;
+      --shadow:  rgba(90, 60, 10, 0.12);
+    }
+
+    body {
+      background: var(--cream);
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(184,149,58,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(184,149,58,0.07) 0%, transparent 60%);
+      min-height: 100vh;
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      color: var(--ink);
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .title-ornament {
+      display: block;
+      font-family: 'Great Vibes', cursive;
+      font-size: 4.2rem;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #8a7040;
+      margin-top: 0.4rem;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.5rem auto 0;
+      width: 260px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .divider-gem {
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--gold);
+      transform: rotate(45deg);
+      background: var(--gold-lt);
+    }
+
+    /* ── Form card ── */
+    .form-card {
+      background: var(--parchment);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 2.2rem 2.5rem;
+      box-shadow: 0 4px 28px var(--shadow), 0 1px 4px rgba(0,0,0,0.04);
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(184,149,58,0.2);
+      border-radius: 1px;
+      pointer-events: none;
+    }
+
+    .form-heading {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 1.6rem;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      color: #8a7040;
+      margin-bottom: 0.4rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      background: rgba(255,255,255,0.7);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--gold-lt);
+      box-shadow: 0 0 0 3px rgba(184,149,58,0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      background: var(--gold);
+      border: none;
+      border-radius: 2px;
+      color: #fff;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      letter-spacing: 0.18em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn:hover  { background: #a07a2a; }
+    .btn:active { transform: scale(0.99); }
+
+    /* error / success flash */
+    .flash {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-top: 0.75rem;
+      min-height: 1.2em;
+      transition: opacity 0.4s;
+    }
+    .flash.error   { color: #9b2a2a; }
+    .flash.success { color: #3a7a45; }
+
+    /* ── Entries section ── */
+    .entries-heading {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.2rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    #entries-list { list-style: none; }
+
+    .entry {
+      background: var(--parchment);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 1.4rem 1.8rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 12px var(--shadow);
+      animation: fadeSlide 0.45s ease both;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .entry-name {
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.75rem;
+      color: var(--gold);
+      line-height: 1.2;
+    }
+
+    .entry-message {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink);
+      margin-top: 0.5rem;
+    }
+
+    .entry-ts {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: #a89060;
+      margin-top: 0.9rem;
+      text-align: right;
+    }
+
+    .empty-state {
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      color: #b0965a;
+      font-size: 1.1rem;
+      padding: 2rem 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #b0965a;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <span class="title-ornament">Guest Book</span>
+    <p class="subtitle">Leave a word, leave a memory</p>
+    <div class="divider">
+      <span class="divider-line"></span>
+      <span class="divider-gem"></span>
+      <span class="divider-line"></span>
+    </div>
+  </header>
+
+  <section class="form-card">
+    <h2 class="form-heading">Sign the Book</h2>
+    <form id="guestbook-form" autocomplete="off">
+      <div class="field">
+        <label for="name">Your Name</label>
+        <input id="name" type="text" placeholder="How shall we address you?" maxlength="80" required />
+      </div>
+      <div class="field">
+        <label for="message">Your Message</label>
+        <textarea id="message" placeholder="Share a thought, a wish, a memory…" maxlength="1000" required></textarea>
+      </div>
+      <button class="btn" type="submit">Sign &amp; Submit</button>
+      <p class="flash" id="flash" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section>
+    <h2 class="entries-heading">The Registry</h2>
+    <ul id="entries-list"></ul>
+  </section>
+
+  <footer>&copy; <script>document.write(new Date().getFullYear())</script> — A Private Guestbook</footer>
+
+</div>
+
+<script>
+  const form   = document.getElementById('guestbook-form');
+  const list   = document.getElementById('entries-list');
+  const flash  = document.getElementById('flash');
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+      + ' · '
+      + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function renderEntry(entry, prepend = false) {
+    const li = document.createElement('li');
+    li.className = 'entry';
+    li.innerHTML = `
+      <div class="entry-name">${escHtml(entry.name)}</div>
+      <p class="entry-message">${escHtml(entry.message)}</p>
+      <p class="entry-ts">${formatDate(entry.timestamp)}</p>
+    `;
+    if (prepend && list.firstChild) {
+      list.insertBefore(li, list.firstChild);
+    } else {
+      list.appendChild(li);
+    }
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showFlash(msg, type) {
+    flash.textContent = msg;
+    flash.className = `flash ${type}`;
+    setTimeout(() => { flash.textContent = ''; flash.className = 'flash'; }, 3500);
+  }
+
+  async function loadEntries() {
+    const res = await fetch('/entries');
+    const data = await res.json();
+    list.innerHTML = '';
+    if (data.length === 0) {
+      list.innerHTML = '<p class="empty-state">No entries yet — be the first to sign.</p>';
+      return;
+    }
+    data.forEach(e => renderEntry(e));
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name    = document.getElementById('name').value.trim();
+    const message = document.getElementById('message').value.trim();
+    if (!name || !message) return;
+
+    const res = await fetch('/entries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, message }),
+    });
+
+    if (!res.ok) {
+      showFlash('Something went wrong. Please try again.', 'error');
+      return;
+    }
+
+    const entry = await res.json();
+    // Remove empty state if present
+    const empty = list.querySelector('.empty-state');
+    if (empty) empty.remove();
+
+    renderEntry(entry, true);
+    form.reset();
+    showFlash('Your entry has been recorded. Thank you.', 'success');
+  });
+
+  loadEntries();
+</script>
+</body>
+</html>
